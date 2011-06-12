@@ -1,10 +1,11 @@
 {
-    "name": "application-name"
+    "name": "sheet"
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
       "express": "2.3.11"
     , "sass": ">= 0.0.1"
     , "jade": ">= 0.0.1"
+    , "socket.io": ">= 0.6.18"
   }
 }
