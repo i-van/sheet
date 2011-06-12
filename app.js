@@ -3,9 +3,11 @@
  * Module dependencies.
  */
 
-var express = require('express');
+var express = require('express')
+  , io = require('socket.io');
 
-var app = module.exports = express.createServer();
+var app = module.exports = express.createServer()
+  , socket = io.listen(app, {transports: ['websocket', 'xhr-polling', 'xhr-multipart']});
 
 // Configuration
 
@@ -32,6 +34,79 @@ app.configure('production', function(){
 app.get('/', function(req, res){
   res.render('index', {
     title: 'Express'
+  });
+});
+
+app.get('/dump', function(req, res){
+  res.send(JSON.stringify(users._storage));
+});
+
+// socket.io
+
+var users = {
+  _storage: [],
+  add: function(user) {
+    this._storage.push(user);
+  },
+  remove: function(id) {
+    for (var i = this._storage.length; i--;) {
+      if (this._storage[i]['id'] == id) {
+        this._storage.splice(i);
+      }
+    }
+  },
+  find: function(id) {
+    for (var i = this._storage.length; i--;) {
+      if (this._storage[i]['id'] == id) {
+        return this._storage[i];
+      }
+    }
+  }
+};
+
+var controller = {
+  selectCell: function(data) {
+    var user = users.find(data.id);
+    user.activeCell = data.cell;
+  },
+  randomColor: function() {
+    return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+  }
+};
+
+socket.on('connection', function(client) {
+  var id = client.sessionId
+    , color = controller.randomColor()
+    , user = {id: id, color: color};
+  
+  users.add(user);
+
+  client.send(JSON.stringify({
+    action: 'initUsers',
+    data: {users: users._storage}
+  }));
+  
+  client.broadcast(JSON.stringify({
+    action: 'newUser',
+    data: {user: user}
+  }));
+  
+  client.on('message', function(res) {
+    client.broadcast(res);
+    try {
+      var res = JSON.parse(res);
+      controller[res.action](res.data);
+    } catch(e) {
+      console.log(e);
+    }
+  });
+  
+  client.on('disconnect', function() {
+    users.remove(id);
+    client.broadcast(JSON.stringify({
+      action: 'forgetUser',
+      data: {id: id}
+    }));
   });
 });
 

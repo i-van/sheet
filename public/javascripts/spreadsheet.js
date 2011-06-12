@@ -3,16 +3,10 @@ var Spreadsheet = function() {
 }
 Spreadsheet.prototype = {
   init: function(id, cols, rows) {
-    this._wrapper = $('#' + id);
+    this._wrapper = $('#' + id).addClass('spreadsheet');
     this._cols = cols || 10;
-    this._rows = rows || 15;
+    this._rows = rows || 25;
     this._instance = 0;
-    
-    this._wrapper.css({
-      '-moz-user-select': 'none',
-      '-khtml-user-select': 'none',
-      'user-select': 'none'
-    });
     
     this._initTable();
     this._initInput();
@@ -25,15 +19,18 @@ Spreadsheet.prototype = {
   _initSelect: function() {
     var that = this;
     this._table.delegate('td', 'click', function() {
-      that.selectCell(that._parseCell($(this)));
+      if (!!that.onSelect) {
+        var cell = that._parseCell($(this));
+        that.onSelect.call(that, cell);
+      }
     });
   },
-  selectCell: function(cell) {
-    if (!!this._selectedCell) {
-      this._findCell(this._selectedCell).css({'background-color': 'inherit'});
+  selectCell: function(cell, color) {
+    var color = color || '#C8C8C8';
+    if (color == 'clear') {
+      color = 'inherit';
     }
-    this._selectedCell = cell;
-    this._findCell(this._selectedCell).css({'background-color': '#C8C8C8'});
+    this._findCell(cell).css({'background-color': color});
   },
   _initInput: function() {
     this._input = $('<input />')
@@ -62,7 +59,6 @@ Spreadsheet.prototype = {
   },
   _initTable: function() {
     this._table = $('<table></table>')
-      .addClass('spreadsheet')
       .attr('cellspacing', 0)
       .attr('cellpadding', 0)
       .appendTo(this._wrapper);
