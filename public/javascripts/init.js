@@ -109,7 +109,6 @@ var controller = {
     }
     sheet.setData(data.sheet);
     users.showList();
-    sheet.show();
     socket.send(JSON.stringify({action: 'setName', data: {name: name, id: id}}));
   },
   newUser: function(data) {
@@ -150,11 +149,13 @@ var socket = new io.Socket(
 socket.on('connect', function() {
   console.log('connected');
   message.text('You are connected');
+  sheet.show();
 });
 
 socket.on('disconnect', function() {
   console.log('disconnected');
   message.text('You are disconnected');
+  sheet.hide();
 });
 
 socket.on('message', function(res) {
