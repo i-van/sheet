@@ -38,44 +38,52 @@ app.get('/', function(req, res) {
 });
 
 app.get('/dump', function(req, res) {
-  res.send(JSON.stringify(users._storage));
+  res.send(
+    'users:' + '<br />' + JSON.stringify(users._storage) + '<br />' + 
+    'sheet:' + '<br />' + JSON.stringify(sheet._storage)
+  );
 });
 
 // socket.io
 
-var users = require('./models/user');
+var users = require('./models/users');
+var sheet = require('./models/sheet');
 
 var controller = {
   selectCell: function(data) {
     var user = users.find(data.id);
     user.activeCell = data.cell;
   },
+  setCell: function(data) {
+    sheet.set(data.cell, data.value);
+  },
   randomColor: function() {
     return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+  },
+  setName: function(data) {
+    var user = users.find(data.id);
+    user.name = data.name;
   }
 };
 
 socket.on('connection', function(client) {
   var id = client.sessionId
-  , color = controller.randomColor()
-  , user = {
-    id: id,
-    color: color
-  };
+    , color = controller.randomColor();
 
-  users.add(user);
+  users.add({id: id, color: color});
 
   client.send(JSON.stringify({
-    action: 'initUsers',
+    action: 'sync',
     data: {
-      users: users._storage
+      users: users._storage,
+      sheet: sheet._storage
     }
   }));
 
   client.broadcast(JSON.stringify({
     action: 'newUser',
     data: {
-      user: user
+      user: {id: id, color: color}
     }
   }));
 
@@ -88,6 +96,7 @@ socket.on('connection', function(client) {
       console.log(e);
     }
   });
+  
   client.on('disconnect', function() {
     users.remove(id);
     client.broadcast(JSON.stringify({
@@ -98,5 +107,6 @@ socket.on('connection', function(client) {
     }));
   });
 });
+
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);

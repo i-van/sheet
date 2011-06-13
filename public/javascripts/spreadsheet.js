@@ -3,7 +3,7 @@ var Spreadsheet = function() {
 }
 Spreadsheet.prototype = {
   init: function(id, cols, rows) {
-    this._wrapper = $('#' + id).addClass('spreadsheet');
+    this._wrapper = $('#' + id).addClass('spreadsheet').hide();
     this._cols = cols || 10;
     this._rows = rows || 25;
     this._instance = 0;
@@ -13,7 +13,10 @@ Spreadsheet.prototype = {
     this._initSelect();
     
     for (var i = 0, n = this._cols; i < n; ++i) {
-      this.setWidth(i, 65);
+      this.setWidth(i, 100);
+    }
+    for (var j = 0, m = this._rows; j < m; ++j) {
+      this.setHeight(j, 20);
     }
   },
   _initSelect: function() {
@@ -54,7 +57,11 @@ Spreadsheet.prototype = {
     });
     this._input.blur(function() {
       var e = $(this).hide();
-      that.setCell(that._activeCell, e.val());
+    });
+    this._input.change(function() {
+      if (!!that.onEdit) {
+        that.onEdit.call(that, that._activeCell);
+      }
     });
   },
   _initTable: function() {
@@ -82,7 +89,7 @@ Spreadsheet.prototype = {
       body.push('<th id="' + id + '"></th>');
       for (var j = 0; j < m; ++j) {
         id = ['cell', this._instance, i, j].join('-');
-        body.push('<td id="' + id + '">' + i + ' ' + j + '</td>');
+        body.push('<td id="' + id + '"></td>');
       }
       body.push('</tr>');
     }
@@ -94,6 +101,16 @@ Spreadsheet.prototype = {
     }
     for (var i = 1; i < m; ++i) {
       this._findCell({row: 0, column: i}).css({'border-width': '1px 1px 1px 0'});
+    }
+  },
+  setData: function(data) {
+    var n = this._rows
+      , m = this._cols;
+    for (var i = 0; i < n; ++i) {
+      for (var j = 0; j < m; ++j) {
+        var cell = {row: i, column: j};
+        this.setCell(cell, data[i][j]);
+      }
     }
   },
   setWidth: function(column, width) {
@@ -114,5 +131,11 @@ Spreadsheet.prototype = {
   _parseCell: function(element) {
     var parts = element.attr('id').split('-');
     return {row:parts[2], column:parts[3]};
+  },
+  show: function() {
+    this._wrapper.show();
+  },
+  hide: function() {
+    this._wrapper.hide();
   }
 };
