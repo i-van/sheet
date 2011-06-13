@@ -6,7 +6,7 @@ module.exports = {
   remove: function(id) {
     for (var i = this._storage.length; i--;) {
       if (this._storage[i]['id'] == id) {
-        this._storage.splice(i);
+        this._storage.splice(i, 1);
       }
     }
   },
