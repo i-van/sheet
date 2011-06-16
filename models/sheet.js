@@ -1,3 +1,7 @@
+/**
+ * sheet
+ */
+
 module.exports = ({
   _cols: 10,
   _rows: 25,
@@ -13,7 +17,7 @@ module.exports = ({
     var n = this._rows
       , m = this._cols
       , row;
-      
+
     for (var i = 0; i < n; ++i) {
       row = [];
       for (var j = 0; j < m; ++j) {
@@ -21,7 +25,10 @@ module.exports = ({
       }
       this._storage.push(row);
     }
-    
+
     return this;
+  },
+  getStorage: function() {
+    return this._storage;
   }
 }).init();

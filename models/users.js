@@ -1,3 +1,7 @@
+/**
+ * users
+ */
+
 module.exports = {
   _storage: [],
   add: function(user) {
@@ -16,5 +20,8 @@ module.exports = {
         return this._storage[i];
       }
     }
+  },
+  getStorage: function() {
+    return this._storage;
   }
 };

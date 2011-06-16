@@ -122,7 +122,7 @@ Spreadsheet.prototype = {
     return this;
   },
   setCell: function(cell, data) {
-    this._findCell(cell).html(data);
+    this._findCell(cell).text(data);
     return this;
   },
   _findCell: function(cell) {
