@@ -1,0 +1,6 @@
+Multi user spreadsheet
+
+Install
+  git clone https://github.com/i-van/sheet.git sheet && cd sheet
+  npm bundle
+  node app.js
