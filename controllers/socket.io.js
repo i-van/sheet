@@ -33,8 +33,8 @@ module.exports = function(socket) {
     client.send(JSON.stringify({
       action: 'sync',
       data: {
-        users: users._storage,
-        sheet: sheet._storage
+        users: users.getStorage(),
+        sheet: sheet.getStorage()
       }
     }));
   

@@ -4,8 +4,8 @@
   , "private": true
   , "dependencies": {
       "express": "2.3.11"
-    , "sass": ">= 0.0.1"
-    , "jade": ">= 0.0.1"
-    , "socket.io": ">= 0.6.18"
+    , "sass": "0.5.0"
+    , "jade": "0.12.1"
+    , "socket.io": "0.6.18"
   }
 }
